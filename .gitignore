@@ -1,0 +1,13 @@
+# ⚠️ 비밀: 개인 Jira API 토큰이 들어있음 — 절대 커밋 금지
+config.json
+
+# 실행/캐시/로그
+server.log
+__pycache__/
+*.pyc
+.DS_Store
+
+# (선택) 개인 정렬/스냅샷을 공유하지 않으려면 아래 주석 해제
+# order.json
+# data.json
+okr_raw.json

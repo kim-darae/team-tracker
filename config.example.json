@@ -1,0 +1,14 @@
+{
+  "jira_site": "https://musinsa-oneteam.atlassian.net",
+  "project_key": "CBPPSP",
+  "email": "YOUR_EMAIL@musinsa.com",
+  "api_token": "",
+  "_안내": "1) https://id.atlassian.com/manage-profile/security/api-tokens 에서 본인 토큰 발급 → api_token 에 붙여넣기. 2) email 을 본인 무신사 이메일로. 3) 이 파일을 config.json 으로 복사해서 사용. (config.json 은 .gitignore 로 커밋 안 됨)",
+  "cloud_id": "23c14e7d-74ed-40b6-a0bb-fbc1f6351b84",
+  "assignees": [
+    {"name": "김다래", "id": "712020:9de4f670-de0e-44d2-ac76-50f90fd10d78"},
+    {"name": "이정빈", "id": "712020:b4dd00d7-9fd9-4356-b95c-2ad2b09513a0"},
+    {"name": "최정흠", "id": "712020:53adf259-df9b-4268-b678-861d7aeaeff7"},
+    {"name": "정윤수", "id": "712020:3197690e-c11d-4fe7-b8d8-8d2a1c940d7e"}
+  ]
+}
