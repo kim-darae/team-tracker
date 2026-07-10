@@ -28,6 +28,8 @@
   .chip:hover{background:var(--grey200)} .chip::after{content:"↗";font-size:11px;color:var(--grey400)}
   .sync-btn{height:37px;padding:0 15px;border-radius:12px;background:var(--grey900);color:#fff;font-size:13px;font-weight:600;flex:none;display:inline-flex;align-items:center;gap:7px}
   .sync-btn:hover{background:var(--grey800)} .sync-btn.busy{opacity:.55;pointer-events:none}
+  .pub-btn{height:37px;padding:0 15px;border-radius:12px;background:var(--blue500);color:#fff;font-size:13px;font-weight:600;flex:none;display:inline-flex;align-items:center;gap:7px}
+  .pub-btn:hover{background:var(--blue600)} .pub-btn.busy{opacity:.55;pointer-events:none}
   .spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
 
@@ -145,7 +147,10 @@
     <div><h1>Partner Platform</h1>
       <div class="desc">OKR · KTLO · 운영효율화 리소스 트래커 — 데이터 기준 <b id="updated"></b> <span id="mode" style="font-size:12px;color:var(--grey400)"></span></div>
     </div>
-    <button class="sync-btn" id="syncBtn" onclick="doSync()">동기화</button>
+    <div style="display:flex;gap:8px;flex:none">
+      <button class="sync-btn" id="syncBtn" onclick="doSync()">동기화</button>
+      <button class="pub-btn" id="pubBtn" onclick="doPublish()">🔗 공유 링크 반영</button>
+    </div>
   </div>
   <div class="chips">
     <a class="chip" id="lnk-okr" target="_blank">OKR 보드</a>
@@ -224,7 +229,7 @@ function deriveAssignees(d){
 function init(){
   document.getElementById("updated").textContent=DATA.updatedAt;
   document.getElementById("mode").textContent=CONF.mode==="readonly"?"· 읽기 전용":CONF.mode==="direct"?"· 직접연동":"· 브리지 모드";
-  if(READONLY) document.getElementById("syncBtn").style.display="none";
+  if(READONLY){ document.getElementById("syncBtn").style.display="none"; document.getElementById("pubBtn").style.display="none"; }
   document.getElementById("lnk-okr").href=DATA.boards.okr;
   document.getElementById("lnk-ktlo").href=DATA.boards.ktlo;
   document.getElementById("lnk-plan").href=DATA.boards.plan;
@@ -421,6 +426,19 @@ async function doSync(auto){
   b.classList.remove("busy");b.textContent="동기화";
 }
 function autoSync(){doSync(true);}
+
+/* ── 공유 링크 반영 (build → commit → push) ── */
+async function doPublish(){
+  const b=document.getElementById("pubBtn");b.classList.add("busy");b.innerHTML=`<span class="spin"></span>반영 중…`;
+  try{
+    const r=await fetch("/api/publish",{method:"POST"});const d=await r.json();
+    if(d.error)throw new Error(d.error);
+    const dd=await fetch("data.json?t="+Date.now()).then(x=>x.json());DATA=dd;
+    document.getElementById("updated").textContent=DATA.updatedAt;refreshCounts();renderStats();render();
+    toast(d.message||"완료", d.ok===false);
+  }catch(e){toast("반영 실패: "+e.message,true);}
+  b.classList.remove("busy");b.innerHTML="🔗 공유 링크 반영";
+}
 
 /* ── status ── */
 async function loadTrans(sel){if(sel.dataset.loaded)return;sel.dataset.loaded="1";const cu=sel.dataset.cur;

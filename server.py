@@ -117,6 +117,31 @@ def build_items():
     items += rest_items
     return items
 
+def do_publish():
+    """build_data.py 로 최신 생성 → 변경 있으면 git commit+push (공유 링크 반영)."""
+    r = subprocess.run(["python3", os.path.join(DIR, "build_data.py")],
+                       capture_output=True, text=True, timeout=180)
+    if r.returncode != 0:
+        raise RuntimeError("데이터 생성 실패: " + (r.stderr or r.stdout)[-300:])
+    g = lambda *a: subprocess.run(["git", "-C", DIR, *a], capture_output=True, text=True)
+    g("add", "data.json", "order.json")
+    if g("diff", "--staged", "--quiet").returncode == 0:
+        return {"ok": True, "changed": False, "message": "변경 없음 — 이미 최신입니다"}
+    g("-c", "user.name=김다래", "-c", "user.email=darae.kim@musinsa.com",
+      "commit", "-q", "-m", "update: 데이터 갱신")
+    # github_token 이 있으면 토큰 URL로 바로 push (완전 원클릭), 없으면 안내
+    tok = CFG.get("github_token")
+    if tok:
+        u = subprocess.run(["git", "-C", DIR, "remote", "get-url", "origin"], capture_output=True, text=True).stdout.strip()
+        push_url = u.replace("https://", f"https://{tok}@") if u.startswith("https://") else u
+        p = subprocess.run(["git", "-C", DIR, "push", "-q", push_url, "HEAD:main"], capture_output=True, text=True, timeout=90)
+    else:
+        p = subprocess.run(["git", "-C", DIR, "push", "-q"], capture_output=True, text=True, timeout=90)
+    if p.returncode != 0:
+        hint = "config.json 의 github_token 을 확인하세요." if tok else "GitHub Desktop에서 Push 를 눌러주세요(또는 config.json 에 github_token 추가하면 자동)."
+        return {"ok": False, "changed": True, "message": "커밋 완료. push 실패 → " + hint}
+    return {"ok": True, "changed": True, "message": "공유 링크 반영 완료 (1~2분 뒤 새로고침)"}
+
 def do_sync():
     if DIRECT:
         data = json.load(open("data.json"))
@@ -222,6 +247,8 @@ class H(http.server.SimpleHTTPRequestHandler):
             if self.path == "/api/order":
                 save_order(body.get("order", {}))
                 return self._json({"ok": True})
+            if self.path == "/api/publish":
+                return self._json(do_publish())
             return self._json({"error": "unknown endpoint"}, 404)
         except Exception as e:
             return self._json({"error": str(e)}, 500)

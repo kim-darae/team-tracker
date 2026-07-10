@@ -3,7 +3,8 @@
   "project_key": "CBPPSP",
   "email": "YOUR_EMAIL@musinsa.com",
   "api_token": "",
-  "_안내": "1) https://id.atlassian.com/manage-profile/security/api-tokens 에서 본인 토큰 발급 → api_token 에 붙여넣기. 2) email 을 본인 무신사 이메일로. 3) 이 파일을 config.json 으로 복사해서 사용. (config.json 은 .gitignore 로 커밋 안 됨)",
+  "github_token": "",
+  "_안내": "1) api_token: https://id.atlassian.com/manage-profile/security/api-tokens 에서 발급(Jira 조회용). 2) github_token(선택): github.com/settings/tokens 에서 classic 토큰(repo 권한) 발급 → 넣으면 '공유 링크 반영' 버튼이 push까지 자동. 비우면 GitHub Desktop에서 수동 Push. 3) email 을 본인 이메일로. 4) 이 파일을 config.json 으로 복사. (config.json 은 커밋 안 됨)",
   "cloud_id": "23c14e7d-74ed-40b6-a0bb-fbc1f6351b84",
   "assignees": [
     {"name": "김다래", "id": "712020:9de4f670-de0e-44d2-ac76-50f90fd10d78"},
