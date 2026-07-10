@@ -76,6 +76,10 @@
   .dtxt.ph{color:var(--grey400)}
   .dcal{font-size:13px;color:var(--grey400);flex:none;line-height:1}
   .dhide{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;cursor:pointer;border:none}
+  .dfield.ro{cursor:default;background:var(--grey50);border-color:transparent}
+  .dfield.ro .dtxt.ph{color:var(--grey300)}
+  .stbadge{display:inline-flex;align-items:center;justify-content:center;flex:none;width:134px;height:30px;border-radius:8px;font-size:12px;font-weight:700;background:var(--grey100);color:var(--grey600)}
+  .stbadge.prog{background:var(--blue50);color:var(--blue600)} .stbadge.done{background:var(--green50);color:var(--green500)}
   .assn{width:62px;flex:none;text-align:left;font-size:13px;font-weight:500;color:var(--grey600);white-space:nowrap;overflow:hidden}
   .assn.none{color:var(--red500);font-weight:600}
   .stsel{appearance:none;-webkit-appearance:none;flex:none;width:134px;height:30px;padding:0 24px 0 11px;border-radius:8px;font-size:12px;font-weight:700;font-family:inherit;background-color:var(--grey100);color:var(--grey600);cursor:pointer;
@@ -198,20 +202,29 @@
 const TRACKS={okr:"OKR",ktlo:"KTLO",ops:"운영효율화",etc:"기타 · 백로그"};
 const TCOLOR={okr:"var(--t-okr)",ktlo:"var(--t-ktlo)",ops:"var(--t-ops)",etc:"var(--t-etc)"};
 const DAY=864e5, PXD=13;
-let DATA=null,CONF=null,cur="all",curPerson=null,ORDER={},drag=null;
+let DATA=null,CONF=null,cur="all",curPerson=null,ORDER={},drag=null,READONLY=false;
 const openSet=new Set(); let dlgParent=null,dateKey=null;
 const newDlg=document.getElementById("newDlg"),dateDlg=document.getElementById("dateDlg");
 const esc=s=>(s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 Promise.all([
   fetch("data.json?t="+Date.now()).then(r=>r.json()),
-  fetch("/api/config").then(r=>r.json()).catch(()=>({mode:"?",assignees:[]})),
-  fetch("/api/order").then(r=>r.json()).catch(()=>({}))
-]).then(([d,c,o])=>{DATA=d;CONF=c;ORDER=o||{};init();autoSync();});
+  fetch("/api/config").then(r=>r.ok?r.json():null).catch(()=>null),
+  fetch("order.json?t="+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({}))
+]).then(([d,c,o])=>{
+  DATA=d; ORDER=o||{};
+  if(c){ CONF=c; } else { READONLY=true; CONF={mode:"readonly", assignees:deriveAssignees(d)}; }
+  init(); if(!READONLY) autoSync();
+});
+function deriveAssignees(d){
+  const seen=[]; for(const i of d.items){ if(i.assignee && !seen.includes(i.assignee)) seen.push(i.assignee); }
+  return seen.map(n=>({name:n,id:""}));
+}
 
 function init(){
   document.getElementById("updated").textContent=DATA.updatedAt;
-  document.getElementById("mode").textContent=CONF.mode==="direct"?"· 직접연동":"· 브리지 모드";
+  document.getElementById("mode").textContent=CONF.mode==="readonly"?"· 읽기 전용":CONF.mode==="direct"?"· 직접연동":"· 브리지 모드";
+  if(READONLY) document.getElementById("syncBtn").style.display="none";
   document.getElementById("lnk-okr").href=DATA.boards.okr;
   document.getElementById("lnk-ktlo").href=DATA.boards.ktlo;
   document.getElementById("lnk-plan").href=DATA.boards.plan;
@@ -254,11 +267,13 @@ function setPerson(p){ curPerson=p; render(); }
 /* ── LIST ── */
 function stSelHtml(i){
   const c=i.statusCat==="In Progress"?"prog":i.statusCat==="Done"?"done":"";
+  if(READONLY) return `<span class="stbadge ${c}">${esc(i.status)}</span>`;
   return `<select class="stsel ${c}" data-key="${i.key}" data-cur="${esc(i.status)}" onclick="event.stopPropagation()" onmousedown="loadTrans(this)" onchange="changeStatus(this)"><option>${esc(i.status)}</option></select>`;
 }
 function fmtDate(v){const[y,m,d]=v.split("-");return `${y}. ${m}. ${d}.`;}
 function dfield(key,fld,val){
   const ph=!val;
+  if(READONLY) return `<div class="dfield ro"><span class="dtxt ${ph?'ph':''}">${ph?'—':fmtDate(val)}</span></div>`;
   return `<div class="dfield" title="${fld==='start'?'시작일':'종료일'}" onclick="event.stopPropagation()">
     <span class="dtxt ${ph?'ph':''}">${ph?'연도. 월. 일.':fmtDate(val)}</span>
     <span class="dcal">🗓</span>
@@ -290,16 +305,15 @@ function card(root,kids,items){
   const isCont=root.type==="Epic"||root.type==="Initiative", open=openSet.has(root.key)?"open":"";
   const tm=root.tm?`<a class="kb tm" target="_blank" onclick="event.stopPropagation()" href="${link(root.tm)}">${esc(root.tm)}</a>`:"";
   let body="";for(const k of kids){body+=crow(k,false);for(const g of items.filter(x=>x.parent===k.key))body+=crow(g,true);}
-  return `<div class="card ${open}" id="card-${root.key}" draggable="true"
-      ondragstart="onDragStart(event,'${root.key}','${root.track}')" ondragover="onDragOver(event,'${root.key}')"
-      ondragleave="onDragLeave(event)" ondrop="onDrop(event,'${root.key}')" ondragend="onDragEnd(event)">
+  const dnd=READONLY?"":`draggable="true" ondragstart="onDragStart(event,'${root.key}','${root.track}')" ondragover="onDragOver(event,'${root.key}')" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'${root.key}')" ondragend="onDragEnd(event)"`;
+  const grip=READONLY?"":`<span class="grip" onclick="event.stopPropagation()" title="드래그해서 우선순위 변경">⠿</span>`;
+  const add=(isCont&&!READONLY)?`<button class="addbtn" title="하위 과제 만들기" onclick="event.stopPropagation();openCreate('${root.key}')">＋</button>`:`<span style="width:30px;flex:none"></span>`;
+  return `<div class="card ${open}" id="card-${root.key}" ${dnd}>
     <div class="chead" onclick="toggle('${root.key}')">
-      <span class="grip" onclick="event.stopPropagation()" title="드래그해서 우선순위 변경">⠿</span>
-      <span class="chev ${kids.length?'':'leaf'}">▶</span>${tm}
+      ${grip}<span class="chev ${kids.length?'':'leaf'}">▶</span>${tm}
       <a class="kb" target="_blank" onclick="event.stopPropagation()" href="${link(root.key)}">${esc(root.key)}</a>
       <span class="ttl">${esc(root.summary)}<span class="ty">${esc(root.type)}</span></span>
-      ${dateInputs(root)}${assnHtml(root)}${stSelHtml(root)}
-      ${isCont?`<button class="addbtn" title="하위 과제 만들기" onclick="event.stopPropagation();openCreate('${root.key}')">＋</button>`:`<span style="width:30px;flex:none"></span>`}
+      ${dateInputs(root)}${assnHtml(root)}${stSelHtml(root)}${add}
     </div>${kids.length?`<div class="cbody">${body}</div>`:""}</div>`;
 }
 function crow(i,gr){
@@ -446,7 +460,7 @@ async function setDate(key,which,val){
     const d=await r.json();if(d.error)throw new Error(d.error);toast(`${key} ${which==='start'?'시작일':'종료일'} 저장`);
   }catch(e){if(it)it[which]=prev;render();toast("저장 실패: "+e.message,true);}
 }
-function openDates(key){dateKey=key;const it=DATA.items.find(i=>i.key===key);
+function openDates(key){if(READONLY)return;dateKey=key;const it=DATA.items.find(i=>i.key===key);
   document.getElementById("d-key").textContent=key;document.getElementById("d-sum").textContent=it?it.summary:"";
   document.getElementById("d-start").value=it.start||"";document.getElementById("d-due").value=it.due||"";dateDlg.showModal();}
 async function submitDates(){
