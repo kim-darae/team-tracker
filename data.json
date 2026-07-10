@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-10 18:40",
+ "updatedAt": "2026-07-10 19:25",
  "jiraBase": "https://musinsa-oneteam.atlassian.net/browse/",
  "boards": {
   "okr": "https://jira.team.musinsa.com/jira/software/c/projects/CBPPSP/boards/10156",
@@ -106,6 +106,20 @@
    "estMd": null
   },
   {
+   "key": "CBPPSP-657",
+   "track": "ops",
+   "summary": "MSS PO 테스트 계정 신청_조강민",
+   "type": "PO/29connect 테스트 계정 권한 요청",
+   "status": "In Progress",
+   "statusCat": "In Progress",
+   "assignee": "이정빈",
+   "parent": "CBPPSP-697",
+   "tm": null,
+   "start": null,
+   "due": null,
+   "estMd": null
+  },
+  {
    "key": "CBPPSP-730",
    "track": "okr",
    "summary": "PRD 작성 및 유관부서 협의",
@@ -129,7 +143,7 @@
    "assignee": "김다래",
    "parent": null,
    "tm": "TM-3866",
-   "start": "2026-06-23",
+   "start": "2026-06-24",
    "due": "2026-09-30",
    "estMd": 43.5
   },
