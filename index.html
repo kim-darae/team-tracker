@@ -55,6 +55,29 @@
   .tabs button.on .count{color:var(--blue500)}
   .tabs .sep{flex:1}
 
+  /* Sync Check */
+  #synccheck{margin:6px 0 4px}
+  .sc-card{background:#fff;border-radius:16px;padding:2px 4px 8px}
+  .sc-head{display:flex;align-items:baseline;gap:9px;padding:16px 16px 8px}
+  .sc-head h2{font-size:16px;font-weight:800}
+  .sc-head .sc-cnt{font-size:13px;font-weight:800;color:var(--red500)}
+  .sc-empty{padding:8px 18px 14px;color:var(--grey500);font-size:13.5px}
+  .sc-row{display:flex;align-items:center;gap:14px;padding:11px 16px;border-top:1px solid var(--grey100)}
+  .sc-row:hover{background:var(--grey50)}
+  .sc-left{flex:1;min-width:80px}
+  .sc-sum{font-size:14.5px;font-weight:600;color:var(--grey800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sc-keys{display:flex;align-items:center;gap:6px;margin-top:5px}
+  .scf{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
+  .scf.mis{background:#FFF4E6;color:#E8590C} .scf.over{background:var(--red50);color:var(--red500)} .scf.eta{background:#F3F0FF;color:#7048E8} .scf.hc{background:#E6FCF5;color:#087F5B}
+  .sc-pair{display:flex;gap:12px;flex:none}
+  .sc-cell{width:162px;display:flex;align-items:center;gap:6px}
+  .sc-lb{font-size:11px;font-weight:800;color:var(--grey400)}
+  .sc-colhead{display:flex;align-items:center;gap:14px;padding:2px 16px 9px;font-size:11.5px;font-weight:600;color:var(--grey400)}
+  .sc-colhead .sc-cell{justify-content:flex-start}
+  .sc-assn{width:62px;flex:none;font-size:13px;color:var(--grey600);white-space:nowrap;overflow:hidden}
+  .sc-due{width:98px;flex:none;font-size:12.5px;font-weight:600;color:var(--grey600);text-align:right}
+  .sc-due.over{color:var(--red500);font-weight:700}
+
   /* list */
   .list-header{display:flex;align-items:baseline;padding:24px 10px 10px}
   .list-header h2{font-size:18px;font-weight:700} .list-header .cnt{font-size:13.5px;font-weight:600;color:var(--grey400);margin-left:8px}
@@ -68,7 +91,7 @@
   .chev{width:16px;flex:none;text-align:center;color:var(--grey400);font-size:11px;transition:transform .18s}
   .card.open .chev{transform:rotate(90deg)} .chev.leaf{visibility:hidden}
   .kb{display:inline-flex;align-items:center;height:25px;padding:0 8px;border-radius:7px;font-size:12px;font-weight:800;white-space:nowrap;background:var(--grey100);color:var(--grey600);flex:none}
-  .kb:hover{background:var(--grey200)} .kb.tm{background:#fff;color:var(--blue500);border:1.5px solid var(--blue500)}
+  .kb:hover{background:var(--grey200)} .kb.tm{background:var(--blue50);color:#5B8DEF;border:none} .kb.tm:hover{background:#D6E9FF}
   .ttl{flex:1;min-width:60px;font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .ttl .ty{font-size:12px;font-weight:600;color:var(--grey400);margin-left:7px}
   .dwrap{display:flex;gap:6px;flex:none;width:286px}
@@ -82,9 +105,10 @@
   .dfield.ro .dtxt.ph{color:var(--grey300)}
   .stbadge{display:inline-flex;align-items:center;justify-content:center;flex:none;width:134px;height:30px;border-radius:8px;font-size:12px;font-weight:700;background:var(--grey100);color:var(--grey600)}
   .stbadge.prog{background:var(--blue50);color:var(--blue600)} .stbadge.done{background:var(--green50);color:var(--green500)}
+  .stbadge.lnk{text-decoration:none;position:relative} .stbadge.lnk::after{content:"↗";font-size:9px;position:absolute;right:6px;top:6px;opacity:.5}
   .assn{width:62px;flex:none;text-align:left;font-size:13px;font-weight:500;color:var(--grey600);white-space:nowrap;overflow:hidden}
   .assn.none{color:var(--red500);font-weight:600}
-  .stsel{appearance:none;-webkit-appearance:none;flex:none;width:134px;height:30px;padding:0 24px 0 11px;border-radius:8px;font-size:12px;font-weight:700;font-family:inherit;background-color:var(--grey100);color:var(--grey600);cursor:pointer;
+  .stsel{appearance:none;-webkit-appearance:none;flex:none;width:134px;height:30px;padding:0 24px 0 11px;border-radius:8px;border:1px solid var(--grey200);font-size:12px;font-weight:700;font-family:inherit;background-color:var(--grey100);color:var(--grey600);cursor:pointer;
     background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="5"><path d="M0 0l4 5 4-5z" fill="%238B95A1"/></svg>');background-repeat:no-repeat;background-position:right 9px center;text-overflow:ellipsis;white-space:nowrap}
   .stsel.prog{background-color:var(--blue50);color:var(--blue600)} .stsel.done{background-color:var(--green50);color:var(--green500)} .stsel.saving{opacity:.45;pointer-events:none}
   .addbtn{width:30px;height:30px;flex:none;border-radius:9px;background:var(--grey100);color:var(--grey600);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center}
@@ -162,6 +186,8 @@
 <div class="pfilter" id="pfilter"></div>
 
 <div id="timeline"></div>
+
+<div id="synccheck"></div>
 
 <div class="tabs" id="tabs">
   <button data-t="all" class="on">전체</button>
@@ -250,7 +276,53 @@ function renderStats(){
     <div class="stat signal"><div class="lbl">시그널</div><div class="num">${p}<small>진행중</small> · ${n}<small>미지정</small></div></div>`;
   document.querySelectorAll(".stat[data-t]").forEach(s=>s.onclick=()=>document.querySelector(`#tabs button[data-t="${s.dataset.t}"]`).click());
 }
-function render(){ renderPFilter(); renderTimeline(); renderList(); }
+function render(){ renderPFilter(); renderTimeline(); renderSyncCheck(); renderList(); }
+
+/* ── 티켓 Sync Check (TM ↔ Epic 상태 불일치 · 기한초과 미착수) ── */
+function renderSyncCheck(){
+  const el=document.getElementById("synccheck");
+  const n=new Date(), ts=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
+  const rows=[];
+  for(const i of DATA.items){
+    if(!i.tm || !matchPerson(i)) continue;
+    const mismatch = i.tmStatusCat && i.statusCat && i.tmStatusCat!==i.statusCat;
+    const overdue  = i.due && i.due<ts && i.statusCat==="To Do";
+    const noeta    = !i.tmDue;   // TM 티켓에 ETA(due) 없음
+    // suggest 단계를 벗어난(준비중 이상 = In Progress) TM인데 Health Check 또는 분기 KR 달성 미입력
+    // Backlog·SUGGESTED(To Do)·HOLD·Done 은 대상 아님
+    const beyond   = i.tmStatusCat==="In Progress" && !/hold/i.test(i.tmStatus||"");
+    const healthck = beyond && (i.tmHealth===false || i.tmKr===false);
+    if(mismatch||overdue||noeta||healthck) rows.push({i,mismatch,overdue,noeta,healthck});
+  }
+  let body;
+  if(!rows.length){
+    body=`<div class="sc-empty">✅ 이상 없음 — 연결된 TM↔Epic 상태가 일치하고, 기한 초과·미착수 건도 없어요</div>`;
+  }else{
+    const colhead=`<div class="sc-colhead">
+      <div class="sc-left">과제 · 연결 티켓 · 사유</div>
+      <div class="sc-pair"><div class="sc-cell">TM 상태</div><div class="sc-cell">Epic 상태</div></div>
+      <span class="sc-assn">담당자</span>
+      <span class="sc-due">마감일</span>
+    </div>`;
+    body=colhead+rows.map(({i,mismatch,overdue,noeta,healthck})=>`<div class="sc-row">
+      <div class="sc-left">
+        <div class="sc-sum" title="${esc(i.summary)}">${esc(i.summary)}</div>
+        <div class="sc-keys">
+          <a class="kb tm" target="_blank" href="${link(i.tm)}">${esc(i.tm)}</a>
+          <a class="kb" target="_blank" href="${link(i.key)}">${esc(i.key)}</a>
+          ${mismatch?'<span class="scf mis">상태 불일치</span>':''}${overdue?'<span class="scf over">기한초과·미착수</span>':''}${noeta?'<span class="scf eta">ETA 체크</span>':''}${healthck?'<span class="scf hc" title="Health Check 또는 분기 KR 달성 미입력">헬스체크 필요</span>':''}
+        </div>
+      </div>
+      <div class="sc-pair">
+        <div class="sc-cell"><span class="sc-lb">TM</span><a class="stbadge ${i.tmStatusCat==='In Progress'?'prog':i.tmStatusCat==='Done'?'done':''} lnk" target="_blank" href="${link(i.tm)}" title="TM 상태는 Jira에서 변경 (필수 필드 다수)">${esc(i.tmStatus||'—')}</a></div>
+        <div class="sc-cell"><span class="sc-lb">Epic</span>${stSel(i.key,i.status,i.statusCat)}</div>
+      </div>
+      <span class="sc-assn">${esc(i.assignee||'미지정')}</span>
+      <span class="sc-due ${overdue?'over':''}">${i.due||'—'}</span>
+    </div>`).join("");
+  }
+  el.innerHTML=`<div class="sc-card"><div class="sc-head"><h2>티켓 Sync Check!</h2><span class="sc-cnt">${rows.length?rows.length+'건':''}</span></div>${body}</div>`;
+}
 
 /* ── 사람 퀵필터 ── */
 function personList(){
@@ -270,11 +342,12 @@ function renderPFilter(){
 function setPerson(p){ curPerson=p; render(); }
 
 /* ── LIST ── */
-function stSelHtml(i){
-  const c=i.statusCat==="In Progress"?"prog":i.statusCat==="Done"?"done":"";
-  if(READONLY) return `<span class="stbadge ${c}">${esc(i.status)}</span>`;
-  return `<select class="stsel ${c}" data-key="${i.key}" data-cur="${esc(i.status)}" onclick="event.stopPropagation()" onmousedown="loadTrans(this)" onchange="changeStatus(this)"><option>${esc(i.status)}</option></select>`;
+function stSel(key,status,cat){
+  const c=cat==="In Progress"?"prog":cat==="Done"?"done":"";
+  if(READONLY) return `<span class="stbadge ${c}">${esc(status)}</span>`;
+  return `<select class="stsel ${c}" data-key="${key}" data-cur="${esc(status)}" onclick="event.stopPropagation()" onmousedown="loadTrans(this)" onchange="changeStatus(this)"><option>${esc(status)}</option></select>`;
 }
+function stSelHtml(i){ return stSel(i.key,i.status,i.statusCat); }
 function fmtDate(v){const[y,m,d]=v.split("-");return `${y}. ${m}. ${d}.`;}
 function dfield(key,fld,val){
   const ph=!val;
@@ -451,8 +524,10 @@ async function changeStatus(sel){const tid=sel.value;if(!tid)return;
   const name=sel.options[sel.selectedIndex].text, cat=sel.options[sel.selectedIndex].dataset.cat||"";sel.classList.add("saving");
   try{const r=await fetch("/api/status",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:sel.dataset.key,transitionId:tid})});
     const d=await r.json();if(d.error)throw new Error(d.error);
-    const it=DATA.items.find(i=>i.key===sel.dataset.key);if(it){it.status=name;it.statusCat=cat||it.statusCat;}
-    renderStats();render();toast(`${sel.dataset.key} → ${name} 반영`);
+    const key=sel.dataset.key;
+    if(key.startsWith("TM-")){ for(const it of DATA.items) if(it.tm===key){it.tmStatus=name;it.tmStatusCat=cat||it.tmStatusCat;} }
+    else { const it=DATA.items.find(i=>i.key===key); if(it){it.status=name;it.statusCat=cat||it.statusCat;} }
+    renderStats();render();toast(`${key} → ${name} 반영`);
   }catch(e){toast("상태 변경 실패: "+e.message,true);render();}}
 
 /* ── create ── */

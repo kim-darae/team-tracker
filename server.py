@@ -27,7 +27,8 @@ KTLO_ROOT, OPS_ROOT = "CBPPSP-663", "CBPPSP-697"
 SETTLE_PROJ = "CBPSPP"  # 정산플랫폼기획 프로젝트 (팀원 담당 건만 병합)
 TEAM_IDS = ",".join('"%s"' % a["id"] for a in CFG["assignees"])
 F_START, F_ESTMD = "customfield_10015", "customfield_12766"
-FIELDS = f"summary,issuetype,parent,status,assignee,duedate,{F_START},{F_ESTMD}"
+F_HEALTH, F_KR = "customfield_10071", "customfield_10712"  # TM 전용: Health Check / 분기 KR 달성
+FIELDS = f"summary,issuetype,parent,status,assignee,duedate,{F_START},{F_ESTMD},{F_HEALTH},{F_KR}"
 JQLS = {
     "ktlo": f'issue in portfolioChildIssuesOf("{KTLO_ROOT}") AND status not in (Done, HOLD)',
     "ops":  f'(issue in portfolioChildIssuesOf("{OPS_ROOT}") OR issue = {OPS_ROOT}) AND status not in (Done, HOLD)',
@@ -115,7 +116,36 @@ def build_items():
     for x in rest_items:
         x["track"] = "okr" if x["key"] in okr else "etc"
     items += rest_items
+    attach_tm(items)
     return items
+
+def _has_val(v):
+    """커스텀필드 값 입력 여부 (None/빈 리스트/빈 문자열 = 미입력)."""
+    if v is None:
+        return False
+    if isinstance(v, (list, dict, str)):
+        return bool(v)
+    return True
+
+
+def attach_tm(items):
+    """tm(=TM 티켓)이 연결된 항목에 TM 티켓의 상태를 붙임 (Sync Check용)."""
+    keys = sorted({i["tm"] for i in items if i.get("tm")})
+    if not keys:
+        return
+    m = {}
+    try:
+        for c in [keys[x:x+90] for x in range(0, len(keys), 90)]:
+            for raw in rest_search("key in (%s)" % ",".join(c)):
+                s = raw["fields"]["status"]
+                m[raw["key"]] = (s["name"], s["statusCategory"]["name"], raw["fields"].get("duedate"),
+                                 _has_val(raw["fields"].get(F_HEALTH)), _has_val(raw["fields"].get(F_KR)))
+    except Exception as e:
+        print("TM 상태 조회 실패(무시):", e)
+    for i in items:
+        t = i.get("tm")
+        if t and t in m:
+            i["tmStatus"], i["tmStatusCat"], i["tmDue"], i["tmHealth"], i["tmKr"] = m[t]
 
 def do_publish():
     """build_data.py 로 최신 생성 → 변경 있으면 git commit+push (공유 링크 반영)."""

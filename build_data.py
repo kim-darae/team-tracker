@@ -27,7 +27,8 @@ if not TOKEN:
 
 KTLO_ROOT, OPS_ROOT, SETTLE_PROJ = "CBPPSP-663", "CBPPSP-697", "CBPSPP"
 F_START, F_ESTMD = "customfield_10015", "customfield_12766"
-FIELDS = f"summary,issuetype,parent,status,assignee,duedate,{F_START},{F_ESTMD}"
+F_HEALTH, F_KR = "customfield_10071", "customfield_10712"  # TM 전용: Health Check / 분기 KR 달성
+FIELDS = f"summary,issuetype,parent,status,assignee,duedate,{F_START},{F_ESTMD},{F_HEALTH},{F_KR}"
 TEAM_IDS = ",".join('"%s"' % a["id"] for a in ASSIGNEES)
 JQLS = {
     "ktlo": f'issue in portfolioChildIssuesOf("{KTLO_ROOT}") AND status not in (Done, HOLD)',
@@ -90,7 +91,36 @@ def build_items():
         okr |= {x["key"] for x in classifiable if x["parent"] in okr}
     for x in classifiable:
         x["track"] = "okr" if x["key"] in okr else "etc"
-    return items + classifiable
+    items += classifiable
+    attach_tm(items)
+    return items
+
+def _has_val(v):
+    """커스텀필드 값 입력 여부 (None/빈 리스트/빈 문자열 = 미입력)."""
+    if v is None:
+        return False
+    if isinstance(v, (list, dict, str)):
+        return bool(v)
+    return True
+
+
+def attach_tm(items):
+    keys = sorted({i["tm"] for i in items if i.get("tm")})
+    if not keys:
+        return
+    m = {}
+    try:
+        for c in [keys[x:x+90] for x in range(0, len(keys), 90)]:
+            for raw in search("key in (%s)" % ",".join(c)):
+                s = raw["fields"]["status"]
+                m[raw["key"]] = (s["name"], s["statusCategory"]["name"], raw["fields"].get("duedate"),
+                                 _has_val(raw["fields"].get(F_HEALTH)), _has_val(raw["fields"].get(F_KR)))
+    except Exception as e:
+        print("TM 상태 조회 실패(무시):", e)
+    for i in items:
+        t = i.get("tm")
+        if t and t in m:
+            i["tmStatus"], i["tmStatusCat"], i["tmDue"], i["tmHealth"], i["tmKr"] = m[t]
 
 def main():
     p = os.path.join(DIR, "data.json")
